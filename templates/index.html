@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>ESP32 Voice Assistant</title>
+</head>
+<body>
+  <h2>🎤 ESP32 Voice Assistant</h2>
+
+  <button id="btnStart">Start</button>
+  <button id="btnStop">Stop</button>
+  <p id="status">Status: Idle</p>
+
+  <h3>You said:</h3>
+  <pre id="user_text">{{ user_text }}</pre>
+
+  <h3>Assistant reply:</h3>
+  <pre id="bot_text">{{ bot_text }}</pre>
+
+  <h3>🔊 Assistant Audio:</h3>
+  <audio id="audioPlayer" controls src="{{ audio_url }}"></audio>
+
+<script>
+  const ws = new WebSocket("ws://localhost:8080/ws-ui");
+  const statusEl = document.getElementById("status");
+  const userText = document.getElementById("user_text");
+  const botText = document.getElementById("bot_text");
+  const audioPlayer = document.getElementById("audioPlayer");
+
+  ws.onopen = () => { statusEl.innerText = "Connected"; };
+  ws.onmessage = evt => {
+    try {
+      const data = JSON.parse(evt.data);
+      if (data.user_text) userText.innerText = data.user_text;
+      if (data.bot_text) botText.innerText = data.bot_text;
+      if (data.audio_url) {
+        audioPlayer.src = data.audio_url;
+        audioPlayer.load();
+        audioPlayer.play();
+      }
+    } catch (e) { console.log(evt.data); }
+  };
+  ws.onclose = () => { statusEl.innerText = "Disconnected"; };
+
+  document.getElementById("btnStart").onclick = () => { ws.send("START"); statusEl.innerText="Recording..."; };
+  document.getElementById("btnStop").onclick = () => { ws.send("STOP"); statusEl.innerText="Processing..."; };
+</script>
+</body>
+</html>
