@@ -21,7 +21,7 @@ os.makedirs(RECORDINGS_DIR, exist_ok=True)
 os.makedirs(RESPONSES_DIR, exist_ok=True)
 
 # Gemini setup
-GEMINI_KEY = "AIzaSyAhkzg8OxlnvURsITfFsD8kiZi09jZuEg0"
+GEMINI_KEY = "your api key "
 if GEMINI_KEY:
     genai.configure(api_key=GEMINI_KEY)
 else:
